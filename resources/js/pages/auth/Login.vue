@@ -11,13 +11,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-
-defineOptions({
-    layout: {
-        title: 'Log in to your account',
-        description: 'Enter your email and password below to log in',
-    },
-});
+import AuthSplitLayout from '@/layouts/auth/AuthSplitLayout.vue';
 
 defineProps<{
     status?: string;
@@ -29,22 +23,19 @@ defineProps<{
 <template>
     <Head title="Log in" />
 
-    <div
-        v-if="status"
-        class="mb-4 text-center text-sm font-medium text-green-600"
-    >
-        {{ status }}
-    </div>
+    <AuthSplitLayout title="Welcome back" description="Log in to your account to continue">
+        <div v-if="status" class="mb-4 text-center text-sm font-medium text-emerald-600">
+            {{ status }}
+        </div>
 
-    <Form
-        v-bind="store.form()"
-        :reset-on-success="['password']"
-        v-slot="{ errors, processing }"
-        class="flex flex-col gap-6"
-    >
-        <div class="grid gap-6">
-            <div class="grid gap-2">
-                <Label for="email">Email address</Label>
+        <Form
+            v-bind="store.form()"
+            :reset-on-success="['password']"
+            v-slot="{ errors, processing }"
+            class="flex flex-col gap-5"
+        >
+            <div class="space-y-1.5">
+                <Label for="email" class="text-sm">Email address</Label>
                 <Input
                     id="email"
                     type="email"
@@ -54,17 +45,18 @@ defineProps<{
                     :tabindex="1"
                     autocomplete="email"
                     placeholder="email@example.com"
+                    class="h-9"
                 />
                 <InputError :message="errors.email" />
             </div>
 
-            <div class="grid gap-2">
+            <div class="space-y-1.5">
                 <div class="flex items-center justify-between">
-                    <Label for="password">Password</Label>
+                    <Label for="password" class="text-sm">Password</Label>
                     <TextLink
                         v-if="canResetPassword"
                         :href="request()"
-                        class="text-sm"
+                        class="text-xs text-muted-foreground hover:text-foreground"
                         :tabindex="5"
                     >
                         Forgot password?
@@ -77,35 +69,33 @@ defineProps<{
                     :tabindex="2"
                     autocomplete="current-password"
                     placeholder="Password"
+                    class="h-9"
                 />
                 <InputError :message="errors.password" />
             </div>
 
-            <div class="flex items-center justify-between">
-                <Label for="remember" class="flex items-center space-x-3">
-                    <Checkbox id="remember" name="remember" :tabindex="3" />
-                    <span>Remember me</span>
+            <div class="flex items-center pt-1">
+                <Label for="remember" class="flex items-center gap-2 cursor-pointer">
+                    <Checkbox id="remember" name="remember" :tabindex="3" class="rounded-sm w-4 h-4" />
+                    <span class="text-sm font-normal text-muted-foreground hover:text-foreground transition-colors">Remember for 30 days</span>
                 </Label>
             </div>
 
             <Button
                 type="submit"
-                class="mt-4 w-full"
+                class="mt-2 w-full"
                 :tabindex="4"
                 :disabled="processing"
                 data-test="login-button"
             >
-                <Spinner v-if="processing" />
-                Log in
+                <Spinner v-if="processing" class="mr-2 h-4 w-4" />
+                Sign in
             </Button>
-        </div>
 
-        <div
-            class="text-center text-sm text-muted-foreground"
-            v-if="canRegister"
-        >
-            Don't have an account?
-            <TextLink :href="register()" :tabindex="5">Sign up</TextLink>
-        </div>
-    </Form>
+            <div v-if="canRegister" class="mt-4 text-center text-sm text-muted-foreground">
+                Don't have an account?
+                <TextLink :href="register()" :tabindex="5" class="font-medium text-foreground hover:underline ml-1">Sign up</TextLink>
+            </div>
+        </Form>
+    </AuthSplitLayout>
 </template>
